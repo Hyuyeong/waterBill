@@ -1,0 +1,56 @@
+﻿@model List<WaterConsumption>
+@{
+    int counter = 1;
+}
+
+@{
+    var lastItem = Model.OrderByDescending(x => x.Id).FirstOrDefault();
+}
+
+
+
+<div class="container">
+    <div>
+        <h2>Water Bill</h2>
+        <div class="text-end">
+            <a asp-asp-controller="WaterConsumption" asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle m-2"></i>Create New Water Consumption</a>
+        </div>
+    </div>
+    
+    <table class="table table-striped">
+    <thead>
+        <tr>
+        <th scope="col">#</th>
+        <th scope="col">Date</th>
+        <th scope="col">Meter Reading</th>
+        <th scope="col">Actual or Estimate</th>
+        <th scope="col">Charge(NZD)</th>
+        <th scope="col">Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    @foreach (var item in Model){
+        <tr>
+            <th scope="row">@(counter++)</th>
+            <td>@item.Date.ToString("dd-MMM-yyyy")</td>
+            <td>@item.MeterReading</td>
+            <td>@item.ActualOrEstimate</td>
+            <td>@item.Charge.ToString("F2")</td>
+            <td>
+                @if (item.Id == lastItem?.Id)
+                {
+                    <div class="d-grid gap-2 d-md-block" role="group">
+                        <a asp-controller="WaterConsumption" asp-action="Delete" asp-route-id="@item.Id" class="btn-danger btn">
+                            <i class="bi bi-trash-fill"></i> Delete
+                        </a>
+                    </div>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+    </table>
+
+</div>
+
