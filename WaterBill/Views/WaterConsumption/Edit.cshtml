@@ -1,0 +1,64 @@
+﻿@model WaterConsumption
+
+<div class="container">
+    <h2>Create Water Consumption</h2>
+    <form method="post" id="waterConsumptionForm">
+        <div class="mb-3">
+            <label class="form-label" asp-for="Date"></label>
+            <input type="date" class="form-control" asp-for="Date" id="dateInput">
+            <span class="text-danger" id="dateError"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="MeterReading"></label>
+            <input type="number" class="form-control" asp-for="MeterReading" id="meterReadingInput">
+            <span class="text-danger" id="meterReadingError"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" asp-for="ActualOrEstimate"></label>
+            <select class="form-control" asp-for="ActualOrEstimate">
+                <option value="Actual">Actual</option>
+                <option value="Estimate">Estimate</option>
+            </select>
+            <span asp-validation-for="ActualOrEstimate" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a class="btn btn-secondary" asp-controller="WaterConsumption" asp-action="Index">Back to Water Consumption</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+
+    <script>
+        $(document).ready(function () {
+            var lastDate = "@ViewBag.LastDate"; // Last recorded date
+            var lastMeterReading = @ViewBag.LastMeterReading; // Last recorded meter reading
+
+            $("#waterConsumptionForm").submit(function (e) {
+                var selectedDate = $("#dateInput").val();
+                var meterReading = parseInt($("#meterReadingInput").val(), 10);
+                var isValid = true;
+
+                // Date validation
+                if (lastDate && selectedDate <= lastDate) {
+                    $("#dateError").text("Date must be after the last recorded date (" + lastDate + ").");
+                    isValid = false;
+                } else {
+                    $("#dateError").text("");
+                }
+
+                // Meter Reading validation
+                if (meterReading <= lastMeterReading) {
+                    $("#meterReadingError").text("Meter Reading must be greater than the last recorded value (" + lastMeterReading + ").");
+                    isValid = false;
+                } else {
+                    $("#meterReadingError").text("");
+                }
+
+                if (!isValid) {
+                    e.preventDefault(); // Stop form submission if validation fails
+                }
+            });
+        });
+    </script>
+}

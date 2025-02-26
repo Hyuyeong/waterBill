@@ -41,6 +41,9 @@
                 @if (item.Id == lastItem?.Id)
                 {
                     <div class="d-grid gap-2 d-md-block" role="group">
+                        <a asp-controller="WaterConsumption" asp-action="Edit" asp-route-id="@item.Id" class="btn-primary btn">
+                            <i class="bi bi-pencil-square"></i> Edit
+                        </a>
                         <a asp-controller="WaterConsumption" asp-action="Delete" asp-route-id="@item.Id" class="btn-danger btn">
                             <i class="bi bi-trash-fill"></i> Delete
                         </a>

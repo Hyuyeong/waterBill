@@ -71,5 +71,57 @@ namespace WaterBill.Controllers
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        public IActionResult Edit(int? id)
+        {
+            var lastBeforeRecord = _db
+                .WaterConsumptions.Where(w => w.Date < _db.WaterConsumptions.Max(wc => wc.Date)) // Get records before the latest date
+                .OrderByDescending(w => w.Date) // Sort descending to get the most recent before the latest
+                .FirstOrDefault(); // Get the top 1 result
+            ViewBag.LastDate = lastBeforeRecord?.Date.ToString("yyyy-MM-dd"); // Format for HTML date input
+            ViewBag.LastMeterReading = lastBeforeRecord?.MeterReading ?? 0;
+
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            WaterConsumption? waterConsumptionFromDb = _db.WaterConsumptions.Find(id);
+
+            if (waterConsumptionFromDb == null)
+            {
+                return NotFound();
+            }
+            return View(waterConsumptionFromDb);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(WaterConsumption obj)
+        {
+            var lastBeforeRecord = _db
+                .WaterConsumptions.Where(w => w.Date < _db.WaterConsumptions.Max(wc => wc.Date)) // Get records before the latest date
+                .OrderByDescending(w => w.Date) // Sort descending to get the most recent before latest
+                .FirstOrDefault(); // Get the top 1 result
+
+            if (lastBeforeRecord != null) // Ensure lastBeforeRecord is not null
+            {
+                obj.Charge =
+                    ((obj.MeterReading - lastBeforeRecord.MeterReading) * 2.142)
+                    + ((obj.MeterReading - lastBeforeRecord.MeterReading) * 0.785) * 3.726;
+            }
+            else
+            {
+                // If there's no previous record, you might want to set a default charge or handle it differently
+                obj.Charge = 0; // Set default charge if no previous record exists
+            }
+
+            if (ModelState.IsValid)
+            {
+                _db.WaterConsumptions.Update(obj);
+                await _db.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+
+            return View(obj); // Return view with obj to retain user input in case of errors
+        }
     }
 }
